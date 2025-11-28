@@ -10,3 +10,4 @@ mlruns/
 # Fichiers temporaires Python
 __pycache__/
 *.pyc
+.history/
