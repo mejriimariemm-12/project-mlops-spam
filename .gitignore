@@ -1,0 +1,12 @@
+# Environnements virtuels
+venv/
+
+# DVC local storage
+dvc_storage/
+
+# MLflow runs
+mlruns/
+
+# Fichiers temporaires Python
+__pycache__/
+*.pyc
