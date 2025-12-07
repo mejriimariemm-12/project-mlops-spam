@@ -17,13 +17,13 @@ stages:
       size: 486376
     - path: src/data/preprocess.py
       hash: md5
-      md5: e3d433d7be59c72fdce20c122313705f
-      size: 1499
+      md5: e1adb282282680b9558b96bdf1fe000c
+      size: 2602
     outs:
     - path: data/processed/sms_clean.csv
       hash: md5
-      md5: ea6d8cb4229bc049ab4779f234879f50
-      size: 409769
+      md5: 6fc2894d4414bb37727e932252f6887f
+      size: 413301
   train:
     cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
       models/model.pkl
@@ -68,88 +68,88 @@ stages:
     deps:
     - path: data/processed/sms_clean.csv
       hash: md5
-      md5: ea6d8cb4229bc049ab4779f234879f50
-      size: 409769
+      md5: 6fc2894d4414bb37727e932252f6887f
+      size: 413301
     - path: src/models/train.py
       hash: md5
-      md5: cd2508141d92e21fd5a6cf85c0cddeb8
-      size: 7653
+      md5: 33c27aa5bbc2dfe652669bcf0ed56c54
+      size: 8348
     outs:
     - path: models/model_logistic.pkl
       hash: md5
-      md5: f1d818559d6590161470ae2967aeff7b
-      size: 231505
+      md5: 47dc48e0d46ce0900f565f75a0f52ccc
+      size: 231936
   train_svm:
     cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
       models/model_svm.pkl --model_type svm
     deps:
     - path: data/processed/sms_clean.csv
       hash: md5
-      md5: ea6d8cb4229bc049ab4779f234879f50
-      size: 409769
+      md5: 6fc2894d4414bb37727e932252f6887f
+      size: 413301
     - path: src/models/train.py
       hash: md5
-      md5: cd2508141d92e21fd5a6cf85c0cddeb8
-      size: 7653
+      md5: 33c27aa5bbc2dfe652669bcf0ed56c54
+      size: 8348
     outs:
     - path: models/model_svm.pkl
       hash: md5
-      md5: c42c0eceed351ac550678b30f02dd270
-      size: 231378
+      md5: 59e8e5f44e9367efa0ee6c21da6c9144
+      size: 514367
   train_nb:
     cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
       models/model_nb.pkl --model_type nb
     deps:
     - path: data/processed/sms_clean.csv
       hash: md5
-      md5: ea6d8cb4229bc049ab4779f234879f50
-      size: 409769
+      md5: 6fc2894d4414bb37727e932252f6887f
+      size: 413301
     - path: src/models/train.py
       hash: md5
-      md5: cd2508141d92e21fd5a6cf85c0cddeb8
-      size: 7653
+      md5: 33c27aa5bbc2dfe652669bcf0ed56c54
+      size: 8348
     outs:
     - path: models/model_nb.pkl
       hash: md5
-      md5: 435f2692a53137a157c5a71a0e2478f2
-      size: 351441
+      md5: b6a51b0a426d2274d872c6a6f055948a
+      size: 351865
   train_rf:
     cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
       models/model_rf.pkl --model_type rf
     deps:
     - path: data/processed/sms_clean.csv
       hash: md5
-      md5: ea6d8cb4229bc049ab4779f234879f50
-      size: 409769
+      md5: 6fc2894d4414bb37727e932252f6887f
+      size: 413301
     - path: src/models/train.py
       hash: md5
-      md5: cd2508141d92e21fd5a6cf85c0cddeb8
-      size: 7653
+      md5: 33c27aa5bbc2dfe652669bcf0ed56c54
+      size: 8348
     outs:
     - path: models/model_rf.pkl
       hash: md5
-      md5: 20ec416112c685f7406726ebac8b6cde
-      size: 8122098
+      md5: 6cd84e5f19bf92436ada506d8108a4c2
+      size: 1463969
   evaluate_all:
     cmd: python src/models/evaluate_all.py --models_dir models/ --data 
       data/processed/sms_clean.csv --out reports/comparison.json
     deps:
     - path: models/model_logistic.pkl
       hash: md5
-      md5: f1d818559d6590161470ae2967aeff7b
-      size: 231505
+      md5: 47dc48e0d46ce0900f565f75a0f52ccc
+      size: 231936
     - path: models/model_nb.pkl
       hash: md5
-      md5: 435f2692a53137a157c5a71a0e2478f2
-      size: 351441
+      md5: b6a51b0a426d2274d872c6a6f055948a
+      size: 351865
     - path: models/model_rf.pkl
       hash: md5
-      md5: 20ec416112c685f7406726ebac8b6cde
-      size: 8122098
+      md5: 6cd84e5f19bf92436ada506d8108a4c2
+      size: 1463969
     - path: models/model_svm.pkl
       hash: md5
-      md5: c42c0eceed351ac550678b30f02dd270
-      size: 231378
+      md5: 59e8e5f44e9367efa0ee6c21da6c9144
+      size: 514367
     - path: src/models/evaluate_all.py
       hash: md5
       md5: 10fe3c1d0271729b4eb374ef5fccff6f
@@ -157,5 +157,5 @@ stages:
     outs:
     - path: reports/comparison.json
       hash: md5
-      md5: 734ff1ae82593ea0be75078d99621eed
-      size: 2660
+      md5: 2d6c91996ee3bb7a6c929e3a014f0c20
+      size: 2296
