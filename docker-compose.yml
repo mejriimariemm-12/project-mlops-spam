@@ -1,0 +1,11 @@
+﻿version: '3.8'
+
+services:
+  api:
+    build: .
+    ports:
+      - "8001:8000"  # Port 8001 sur votre PC → 8000 dans Docker
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+    command: uvicorn src.api.main:app --host 0.0.0.0 --port 8000

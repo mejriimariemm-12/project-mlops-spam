@@ -1,0 +1,7 @@
+﻿# Fichiers à ignorer dans Docker
+__pycache__/
+venv/
+.dvc/
+.git/
+*.pyc
+.DS_Store

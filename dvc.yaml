@@ -1,30 +1,61 @@
+# dvc.yaml - Version simplifiée sans params
+vars:
+  - data_path: "data/raw/sms.csv"
+  - processed_path: "data/processed/sms_clean.csv"
+
 stages:
   collect_data:
-    cmd: python src/data/collect_data.py --out data/raw/sms.csv
+    cmd: python src/data/collect_data.py --out ${data_path}
     outs:
-      - data/raw/sms.csv
+      - ${data_path}
 
   preprocess:
-    cmd: python src/data/preprocess.py --in data/raw/sms.csv --out data/processed/sms_clean.csv
+    cmd: python src/data/preprocess.py --in ${data_path} --out ${processed_path}
     deps:
       - src/data/preprocess.py
-      - data/raw/sms.csv
+      - ${data_path}
     outs:
-      - data/processed/sms_clean.csv
+      - ${processed_path}
 
-  train:
-    cmd: python src/models/train.py --data data/processed/sms_clean.csv --out models/model.pkl
+  train_logistic:
+    cmd: python src/models/train.py --data ${processed_path} --out models/model_logistic.pkl --model_type logistic
     deps:
       - src/models/train.py
-      - data/processed/sms_clean.csv
+      - ${processed_path}
     outs:
-      - models/model.pkl
+      - models/model_logistic.pkl
 
-  evaluate:
-    cmd: python src/models/evaluate.py --model models/model.pkl --data data/processed/sms_clean.csv --out reports/metrics.json
+  train_svm:
+    cmd: python src/models/train.py --data ${processed_path} --out models/model_svm.pkl --model_type svm
     deps:
-      - src/models/evaluate.py
-      - models/model.pkl
-      - data/processed/sms_clean.csv
+      - src/models/train.py
+      - ${processed_path}
     outs:
-      - reports/metrics.json
+      - models/model_svm.pkl
+
+  train_nb:
+    cmd: python src/models/train.py --data ${processed_path} --out models/model_nb.pkl --model_type nb
+    deps:
+      - src/models/train.py
+      - ${processed_path}
+    outs:
+      - models/model_nb.pkl
+
+  train_rf:
+    cmd: python src/models/train.py --data ${processed_path} --out models/model_rf.pkl --model_type rf
+    deps:
+      - src/models/train.py
+      - ${processed_path}
+    outs:
+      - models/model_rf.pkl
+
+  evaluate_all:
+    cmd: python src/models/evaluate_all.py --models_dir models/ --data ${processed_path} --out reports/comparison.json
+    deps:
+      - models/model_logistic.pkl
+      - models/model_svm.pkl
+      - models/model_nb.pkl
+      - models/model_rf.pkl
+      - src/models/evaluate_all.py
+    outs:
+      - reports/comparison.json
