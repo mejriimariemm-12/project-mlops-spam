@@ -62,3 +62,100 @@ stages:
       hash: md5
       md5: dcfd0ff81d2d246deb983261b494a3eb
       size: 149
+  train_logistic:
+    cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
+      models/model_logistic.pkl --model_type logistic
+    deps:
+    - path: data/processed/sms_clean.csv
+      hash: md5
+      md5: ea6d8cb4229bc049ab4779f234879f50
+      size: 409769
+    - path: src/models/train.py
+      hash: md5
+      md5: cd2508141d92e21fd5a6cf85c0cddeb8
+      size: 7653
+    outs:
+    - path: models/model_logistic.pkl
+      hash: md5
+      md5: f1d818559d6590161470ae2967aeff7b
+      size: 231505
+  train_svm:
+    cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
+      models/model_svm.pkl --model_type svm
+    deps:
+    - path: data/processed/sms_clean.csv
+      hash: md5
+      md5: ea6d8cb4229bc049ab4779f234879f50
+      size: 409769
+    - path: src/models/train.py
+      hash: md5
+      md5: cd2508141d92e21fd5a6cf85c0cddeb8
+      size: 7653
+    outs:
+    - path: models/model_svm.pkl
+      hash: md5
+      md5: c42c0eceed351ac550678b30f02dd270
+      size: 231378
+  train_nb:
+    cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
+      models/model_nb.pkl --model_type nb
+    deps:
+    - path: data/processed/sms_clean.csv
+      hash: md5
+      md5: ea6d8cb4229bc049ab4779f234879f50
+      size: 409769
+    - path: src/models/train.py
+      hash: md5
+      md5: cd2508141d92e21fd5a6cf85c0cddeb8
+      size: 7653
+    outs:
+    - path: models/model_nb.pkl
+      hash: md5
+      md5: 435f2692a53137a157c5a71a0e2478f2
+      size: 351441
+  train_rf:
+    cmd: python src/models/train.py --data data/processed/sms_clean.csv --out 
+      models/model_rf.pkl --model_type rf
+    deps:
+    - path: data/processed/sms_clean.csv
+      hash: md5
+      md5: ea6d8cb4229bc049ab4779f234879f50
+      size: 409769
+    - path: src/models/train.py
+      hash: md5
+      md5: cd2508141d92e21fd5a6cf85c0cddeb8
+      size: 7653
+    outs:
+    - path: models/model_rf.pkl
+      hash: md5
+      md5: 20ec416112c685f7406726ebac8b6cde
+      size: 8122098
+  evaluate_all:
+    cmd: python src/models/evaluate_all.py --models_dir models/ --data 
+      data/processed/sms_clean.csv --out reports/comparison.json
+    deps:
+    - path: models/model_logistic.pkl
+      hash: md5
+      md5: f1d818559d6590161470ae2967aeff7b
+      size: 231505
+    - path: models/model_nb.pkl
+      hash: md5
+      md5: 435f2692a53137a157c5a71a0e2478f2
+      size: 351441
+    - path: models/model_rf.pkl
+      hash: md5
+      md5: 20ec416112c685f7406726ebac8b6cde
+      size: 8122098
+    - path: models/model_svm.pkl
+      hash: md5
+      md5: c42c0eceed351ac550678b30f02dd270
+      size: 231378
+    - path: src/models/evaluate_all.py
+      hash: md5
+      md5: 10fe3c1d0271729b4eb374ef5fccff6f
+      size: 10630
+    outs:
+    - path: reports/comparison.json
+      hash: md5
+      md5: 734ff1ae82593ea0be75078d99621eed
+      size: 2660

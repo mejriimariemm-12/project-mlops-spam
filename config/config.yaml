@@ -1,0 +1,101 @@
+# config/config.yaml - Configuration complète MLOps
+app:
+  name: "spam-classifier-mlops"
+  version: "1.0.0"
+  description: "MLOps Pipeline for SMS Spam Detection"
+
+paths:
+  base: "."
+  data:
+    raw: "data/raw/sms.csv"
+    processed: "data/processed/sms_clean.csv"
+    external: "data/external"
+  models:
+    directory: "models"
+    default: "models/model_rf.pkl" # Random Forest - meilleur modèle
+    vectorizer: "models/vectorizer.pkl"
+  reports:
+    metrics: "reports/metrics.json"
+    evaluation: "reports/evaluation_report.json"
+    comparison: "reports/comparison.json"
+  logs: "logs"
+  mlruns: "mlruns"
+
+data:
+  source_url: "https://archive.ics.uci.edu/ml/machine-learning-databases/00228/smsspamcollection.zip"
+  columns: ["label", "text"]
+  label_mapping:
+    ham: 0
+    spam: 1
+  test_size: 0.2
+  random_state: 42
+
+preprocessing:
+  text_cleaning:
+    lowercase: true
+    remove_punctuation: true
+    remove_numbers: true
+    remove_extra_spaces: true
+    strip_whitespace: true
+  vectorizer:
+    type: "tfidf"
+    max_features: 5000
+    ngram_range: [1, 2]
+    stop_words: "english"
+    min_df: 2
+    max_df: 0.95
+
+models:
+  default: "rf"
+  available: ["logistic", "svm", "nb", "rf"]
+  parameters:
+    logistic:
+      max_iter: 1000
+      C: 1.0
+      solver: "lbfgs"
+      random_state: 42
+      class_weight: "balanced" # AJOUTÉ
+    svm:
+      C: 1.0
+      probability: true # AJOUTÉ (pour SVC)
+      random_state: 42
+      class_weight: "balanced" # AJOUTÉ
+    nb:
+      alpha: 1.0
+      fit_prior: true
+    rf:
+      n_estimators: 200 # AUGMENTÉ
+      max_depth: 20 # LIMITÉ
+      min_samples_split: 5
+      min_samples_leaf: 2
+      class_weight: "balanced"
+      random_state: 42
+      n_jobs: -1
+
+training:
+  cv_folds: 5
+  scoring: "f1"
+  early_stopping: false
+  validation_size: 0.1
+
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1", "roc_auc"]
+  threshold: 0.5
+  classification_report: true
+  confusion_matrix: true
+  save_plots: true
+
+mlflow:
+  tracking_uri: "file:./mlruns"
+  experiment_name: "spam_detection"
+  registry_uri: ""
+  autolog: false
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+  workers: 4
+  timeout: 30
+  model_retry_count: 3
+  model_retry_delay: 5

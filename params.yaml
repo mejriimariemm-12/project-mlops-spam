@@ -1,6 +1,55 @@
-data_path: "data/raw/spam.csv"
-
-train:
+# params.yaml - Version complète
+data:
+  path: "data/raw/sms.csv"
+  processed_path: "data/processed/sms_clean.csv"
   test_size: 0.2
   random_state: 42
-  model_path: "models/model.pkl"
+
+preprocess:
+  lowercase: true
+  remove_punctuation: true
+  remove_numbers: true
+  min_text_length: 3
+
+vectorizer:
+  type: "tfidf"
+  max_features: 5000
+  ngram_range: [1, 2]
+  min_df: 2
+  max_df: 0.95
+
+models:
+  default: "logistic"
+
+  logistic:
+    C: 1.0
+    max_iter: 1000
+    solver: "lbfgs"
+    random_state: 42
+
+  svm:
+    C: 1.0
+    kernel: "linear"
+    max_iter: 1000
+    random_state: 42
+
+  nb:
+    alpha: 1.0
+    fit_prior: true
+
+  rf:
+    n_estimators: 100
+    max_depth: null
+    random_state: 42
+
+training:
+  cv_folds: 5
+  scoring: "f1_score"
+  save_model: true
+
+evaluation:
+  metrics: ["accuracy", "precision", "recall", "f1_score"]
+  save_report: true
+
+mlflow:
+  experiment_name: "spam_detection"

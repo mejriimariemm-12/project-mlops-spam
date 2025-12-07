@@ -1,0 +1,90 @@
+{
+  "comparison_date": "2025-12-07T14:21:09.231343",
+  "data_info": {
+    "path": "data/processed/sms_clean.csv",
+    "n_samples": 5167,
+    "class_distribution": {
+      "0": 4514,
+      "1": 653
+    },
+    "positive_ratio": 0.12637894329398103
+  },
+  "models_evaluated": 8,
+  "models_successful": 4,
+  "best_model": {
+    "name": "svm",
+    "file": "models\\model_svm.pkl",
+    "metrics": {
+      "accuracy": 0.99496806657635,
+      "precision": 0.9921507064364207,
+      "recall": 0.9678407350689127,
+      "f1_score": 0.9798449612403101,
+      "roc_auc": 0.9991996992850557
+    },
+    "model_type": "svm"
+  },
+  "all_results": {
+    "logistic": {
+      "metrics": {
+        "accuracy": 0.9885813818463325,
+        "precision": 0.9406528189910979,
+        "recall": 0.9709035222052067,
+        "f1_score": 0.9555388093443858,
+        "roc_auc": 0.9975393891117034
+      },
+      "model_type": "logistic",
+      "timestamp": "2025-12-07T14:19:24.142625"
+    },
+    "nb": {
+      "metrics": {
+        "accuracy": 0.9789045868008516,
+        "precision": 1.0,
+        "recall": 0.8330781010719756,
+        "f1_score": 0.908939014202172,
+        "roc_auc": 0.9930127199978831
+      },
+      "model_type": "nb",
+      "timestamp": "2025-12-07T14:20:03.468639"
+    },
+    "rf": {
+      "metrics": {
+        "accuracy": 0.9775498354944843,
+        "precision": 0.9735449735449735,
+        "recall": 0.8453292496171516,
+        "f1_score": 0.9049180327868852,
+        "roc_auc": 0.9850434686437498
+      },
+      "model_type": "rf",
+      "timestamp": "2025-12-07T14:20:20.314630"
+    },
+    "svm": {
+      "metrics": {
+        "accuracy": 0.99496806657635,
+        "precision": 0.9921507064364207,
+        "recall": 0.9678407350689127,
+        "f1_score": 0.9798449612403101,
+        "roc_auc": 0.9991996992850557
+      },
+      "model_type": "svm",
+      "timestamp": "2025-12-07T14:19:47.839579"
+    }
+  },
+  "ranking_by_f1": [
+    {
+      "model": "svm",
+      "f1_score": 0.9798449612403101
+    },
+    {
+      "model": "logistic",
+      "f1_score": 0.9555388093443858
+    },
+    {
+      "model": "nb",
+      "f1_score": 0.908939014202172
+    },
+    {
+      "model": "rf",
+      "f1_score": 0.9049180327868852
+    }
+  ]
+}
