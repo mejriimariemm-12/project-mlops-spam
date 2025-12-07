@@ -1,4 +1,4 @@
- 
+﻿ 
 # src/models/evaluate_all.py
 import pandas as pd
 import joblib
@@ -11,7 +11,12 @@ import glob
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
 from datetime import datetime
 import matplotlib.pyplot as plt
-import seaborn as sns
+try:
+    import seaborn as sns
+    SEABORN_AVAILABLE = True
+except ImportError:
+    SEABORN_AVAILABLE = False
+    print("Warning: seaborn not installed, using basic matplotlib plots")
 
 def load_config(config_path="config/config.yaml"):
     """Charge la configuration YAML"""
@@ -19,26 +24,26 @@ def load_config(config_path="config/config.yaml"):
         return yaml.safe_load(f)
 
 def evaluate_single_model(model_path, X, y, model_name):
-    """Évalue un seul modèle"""
-    print(f"  Évaluation de {model_name}...")
+    """Ã‰value un seul modÃ¨le"""
+    print(f"  Ã‰valuation de {model_name}...")
     
     try:
-        # Charger le modèle
+        # Charger le modÃ¨le
         model_dict = joblib.load(model_path)
         model = model_dict.get('model')
         vectorizer = model_dict.get('vectorizer')
         
         if model is None or vectorizer is None:
-            print(f"  ⚠️  Modèle ou vectorizer manquant dans {model_path}")
+            print(f"  âš ï¸  ModÃ¨le ou vectorizer manquant dans {model_path}")
             return None
         
-        # Vectoriser les données
+        # Vectoriser les donnÃ©es
         X_vect = vectorizer.transform(X)
         
-        # Prédictions
+        # PrÃ©dictions
         y_pred = model.predict(X_vect)
         
-        # Calcul des métriques de base
+        # Calcul des mÃ©triques de base
         metrics = {
             'accuracy': accuracy_score(y, y_pred),
             'precision': precision_score(y, y_pred),
@@ -46,7 +51,7 @@ def evaluate_single_model(model_path, X, y, model_name):
             'f1_score': f1_score(y, y_pred)
         }
         
-        # AUC-ROC si le modèle supporte predict_proba
+        # AUC-ROC si le modÃ¨le supporte predict_proba
         if hasattr(model, 'predict_proba'):
             y_pred_proba = model.predict_proba(X_vect)[:, 1]
             metrics['roc_auc'] = roc_auc_score(y, y_pred_proba)
@@ -60,15 +65,15 @@ def evaluate_single_model(model_path, X, y, model_name):
         }
         
     except Exception as e:
-        print(f"  ❌ Erreur avec {model_name}: {str(e)}")
+        print(f"  âŒ Erreur avec {model_name}: {str(e)}")
         return None
 
 def create_comparison_plot(results, output_dir):
-    """Crée un graphique de comparaison des modèles"""
+    """CrÃ©e un graphique de comparaison des modÃ¨les"""
     if not results:
         return
     
-    # Préparer les données pour le graphique
+    # PrÃ©parer les donnÃ©es pour le graphique
     model_names = []
     f1_scores = []
     accuracies = []
@@ -90,7 +95,7 @@ def create_comparison_plot(results, output_dir):
     
     plt.subplot(1, 2, 1)
     plt.bar(x, f1_scores, width, label='F1-Score', color='skyblue')
-    plt.xlabel('Modèles')
+    plt.xlabel('ModÃ¨les')
     plt.ylabel('F1-Score')
     plt.title('Comparaison des F1-Scores')
     plt.xticks(x, model_names, rotation=45, ha='right')
@@ -101,7 +106,7 @@ def create_comparison_plot(results, output_dir):
     
     plt.subplot(1, 2, 2)
     plt.bar(x, accuracies, width, label='Accuracy', color='lightgreen')
-    plt.xlabel('Modèles')
+    plt.xlabel('ModÃ¨les')
     plt.ylabel('Accuracy')
     plt.title('Comparaison des Accuracies')
     plt.xticks(x, model_names, rotation=45, ha='right')
@@ -133,16 +138,16 @@ def main():
     # Charger configuration
     config = load_config(args.config)
     
-    # Charger les données
-    print(f"📊 Chargement des données depuis {args.data}")
+    # Charger les donnÃ©es
+    print(f"ðŸ“Š Chargement des donnÃ©es depuis {args.data}")
     data = pd.read_csv(args.data)
     X = data['text'].astype(str)
     y = data['label']
     
-    print(f"📈 Données chargées: {len(X)} échantillons")
-    print(f"📊 Distribution des labels: {y.value_counts().to_dict()}")
+    print(f"ðŸ“ˆ DonnÃ©es chargÃ©es: {len(X)} Ã©chantillons")
+    print(f"ðŸ“Š Distribution des labels: {y.value_counts().to_dict()}")
     
-    # Trouver tous les fichiers de modèle
+    # Trouver tous les fichiers de modÃ¨le
     model_patterns = ["*.pkl", "model_*.pkl"]
     model_files = []
     
@@ -152,14 +157,14 @@ def main():
     model_files = [f for f in model_files if 'vectorizer' not in f.lower()]
     
     if not model_files:
-        print(f"❌ Aucun fichier de modèle trouvé dans {args.models_dir}")
+        print(f"âŒ Aucun fichier de modÃ¨le trouvÃ© dans {args.models_dir}")
         return
     
-    print(f"🔍 {len(model_files)} modèles trouvés:")
+    print(f"ðŸ” {len(model_files)} modÃ¨les trouvÃ©s:")
     for mf in model_files:
         print(f"   - {os.path.basename(mf)}")
     
-    # Évaluer chaque modèle
+    # Ã‰valuer chaque modÃ¨le
     results = {}
     
     for model_file in model_files:
@@ -167,25 +172,25 @@ def main():
         model_name = model_name.replace('model_', '')
         
         print(f"\n{'='*50}")
-        print(f"🧪 ÉVALUATION: {model_name}")
+        print(f"ðŸ§ª Ã‰VALUATION: {model_name}")
         print('='*50)
         
         result = evaluate_single_model(model_file, X, y, model_name)
         results[model_name] = result
     
-    # Identifier les modèles valides
+    # Identifier les modÃ¨les valides
     valid_results = {k: v for k, v in results.items() if v is not None}
     
     if not valid_results:
-        print("❌ Aucun modèle n'a pu être évalué avec succès")
+        print("âŒ Aucun modÃ¨le n'a pu Ãªtre Ã©valuÃ© avec succÃ¨s")
         return
     
-    # Trouver le meilleur modèle (par F1-Score)
+    # Trouver le meilleur modÃ¨le (par F1-Score)
     best_model_name = max(valid_results.items(), 
                          key=lambda x: x[1]['metrics']['f1_score'])[0]
     best_model_info = valid_results[best_model_name]
     
-    # Créer le rapport de comparaison
+    # CrÃ©er le rapport de comparaison
     comparison_report = {
         'comparison_date': datetime.now().isoformat(),
         'data_info': {
@@ -205,7 +210,7 @@ def main():
         'all_results': {}
     }
     
-    # Ajouter les résultats détaillés
+    # Ajouter les rÃ©sultats dÃ©taillÃ©s
     for model_name, model_info in valid_results.items():
         comparison_report['all_results'][model_name] = {
             'metrics': model_info['metrics'],
@@ -231,25 +236,25 @@ def main():
     with open(args.out, 'w', encoding='utf-8') as f:
         json.dump(comparison_report, f, indent=2, ensure_ascii=False)
     
-    # Créer des visualisations
+    # CrÃ©er des visualisations
     plots_dir = os.path.join(os.path.dirname(args.out), 'plots')
     os.makedirs(plots_dir, exist_ok=True)
     
     plot_path = create_comparison_plot(valid_results, plots_dir)
     
     # MLflow tracking
-    print(f"\n📊 Configuration MLflow...")
+    print(f"\nðŸ“Š Configuration MLflow...")
     mlflow.set_tracking_uri(config['mlflow']['tracking_uri'])
     mlflow.set_experiment(config['mlflow']['experiment_name'])
     
     with mlflow.start_run(run_name=f"model_comparison_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
-        # Log des paramètres
+        # Log des paramÃ¨tres
         mlflow.log_param("models_dir", args.models_dir)
         mlflow.log_param("data_path", args.data)
         mlflow.log_param("n_models", len(model_files))
         mlflow.log_param("best_model", best_model_name)
         
-        # Log des métriques du meilleur modèle
+        # Log des mÃ©triques du meilleur modÃ¨le
         for metric_name, metric_value in best_model_info['metrics'].items():
             mlflow.log_metric(f"best_{metric_name}", metric_value)
         
@@ -270,29 +275,29 @@ def main():
         # Log du rapport de comparaison
         mlflow.log_dict(comparison_report, "comparison_report.json")
     
-    # Affichage des résultats
+    # Affichage des rÃ©sultats
     print(f"\n{'='*60}")
-    print("🏆 RÉSULTATS DE LA COMPARAISON")
+    print("ðŸ† RÃ‰SULTATS DE LA COMPARAISON")
     print('='*60)
-    print(f"📊 Modèles évalués: {len(model_files)}")
-    print(f"✅ Modèles réussis: {len(valid_results)}")
-    print(f"🏅 Meilleur modèle: {best_model_name}")
+    print(f"ðŸ“Š ModÃ¨les Ã©valuÃ©s: {len(model_files)}")
+    print(f"âœ… ModÃ¨les rÃ©ussis: {len(valid_results)}")
+    print(f"ðŸ… Meilleur modÃ¨le: {best_model_name}")
     print(f"   F1-Score: {best_model_info['metrics']['f1_score']:.4f}")
     print(f"   Accuracy: {best_model_info['metrics']['accuracy']:.4f}")
     
-    print(f"\n📈 CLASSEMENT (par F1-Score):")
+    print(f"\nðŸ“ˆ CLASSEMENT (par F1-Score):")
     for i, (model_name, f1_score) in enumerate(ranking, 1):
         print(f"   {i:2d}. {model_name:<20} - F1: {f1_score:.4f}")
     
-    print(f"\n💾 Rapport sauvegardé: {args.out}")
+    print(f"\nðŸ’¾ Rapport sauvegardÃ©: {args.out}")
     if plot_path:
-        print(f"📊 Graphique sauvegardé: {plot_path}")
+        print(f"ðŸ“Š Graphique sauvegardÃ©: {plot_path}")
     
-    print(f"\n🔍 Pour voir les résultats dans MLflow:")
+    print(f"\nðŸ” Pour voir les rÃ©sultats dans MLflow:")
     print(f"   mlflow ui --port 5000")
     print('='*60)
     
-    print("\n✅ Comparaison terminée avec succès!")
+    print("\nâœ… Comparaison terminÃ©e avec succÃ¨s!")
 
 if __name__ == "__main__":
     main()
