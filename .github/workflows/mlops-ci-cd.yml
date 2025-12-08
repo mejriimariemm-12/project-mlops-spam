@@ -1,10 +1,10 @@
-﻿name: MLOps CI/CD Pipeline
+name: MLOps CI/CD Pipeline
 
 on:
   push:
-    branches: [main, master]
+    branches: [**]
   pull_request:
-    branches: [main, master]
+    branches: [**]
 
 jobs:
   validate-structure:
@@ -17,26 +17,26 @@ jobs:
 
       - name: Validate project structure
         run: |
-          echo "📁 Validating project structure..."
+          echo "?? Validating project structure..."
           echo ""
-          echo "✅ Required files check:"
-          test -f "requirements.txt" && echo "  - requirements.txt: ✅" || echo "  - requirements.txt: ❌"
-          test -f "Dockerfile" && echo "  - Dockerfile: ✅" || echo "  - Dockerfile: ❌"
-          test -f "src/api/main.py" && echo "  - src/api/main.py: ✅" || echo "  - src/api/main.py: ❌"
-          test -f "src/models/train.py" && echo "  - src/models/train.py: ✅" || echo "  - src/models/train.py: ❌"
-          test -f "src/data/preprocess.py" && echo "  - src/data/preprocess.py: ✅" || echo "  - src/data/preprocess.py: ❌"
+          echo "? Required files check:"
+          test -f "requirements.txt" && echo "  - requirements.txt: ?" || echo "  - requirements.txt: ?"
+          test -f "Dockerfile" && echo "  - Dockerfile: ?" || echo "  - Dockerfile: ?"
+          test -f "src/api/main.py" && echo "  - src/api/main.py: ?" || echo "  - src/api/main.py: ?"
+          test -f "src/models/train.py" && echo "  - src/models/train.py: ?" || echo "  - src/models/train.py: ?"
+          test -f "src/data/preprocess.py" && echo "  - src/data/preprocess.py: ?" || echo "  - src/data/preprocess.py: ?"
           echo ""
 
-          echo "📦 Checking for models:"
+          echo "?? Checking for models:"
           if [ -d "models" ]; then
             model_count=$(ls models/*.pkl 2>/dev/null | wc -l)
             echo "  - Models directory exists with $model_count .pkl files"
           else
-            echo "  - Models directory: ❌ (missing)"
+            echo "  - Models directory: ? (missing)"
           fi
 
           echo ""
-          echo "🌪️ Checking Airflow components:"
+          echo "??? Checking Airflow components:"
           if [ -d "dags" ]; then
             dag_count=$(find dags -name "*.py" -not -name "__pycache__" 2>/dev/null | wc -l)
             echo "  - dags directory exists with $dag_count DAG files"
@@ -45,17 +45,17 @@ jobs:
               find dags -name "*.py" -not -path "*/__pycache__/*" 2>/dev/null | xargs -I {} echo "    - {}"
             fi
           else
-            echo "  - dags directory: ❌ (missing)"
+            echo "  - dags directory: ? (missing)"
           fi
 
           if [ -f "docker-compose.yml" ]; then
-            echo "  - docker-compose.yml: ✅"
+            echo "  - docker-compose.yml: ?"
           else
-            echo "  - docker-compose.yml: ❌"
+            echo "  - docker-compose.yml: ?"
           fi
 
           echo ""
-          echo "🎯 Structure validation completed!"
+          echo "?? Structure validation completed!"
 
   test-imports:
     runs-on: ubuntu-latest
@@ -74,44 +74,44 @@ jobs:
       - name: Install core dependencies
         run: |
           python -m pip install --upgrade pip
-          # Installer les dépendances minimales
+          # Installer les d�pendances minimales
           pip install fastapi==0.104.1 uvicorn==0.24.0 pydantic==2.5.0
           pip install scikit-learn==1.3.2 pandas==2.1.3 numpy==1.24.3
           pip install joblib==1.3.2 pyyaml==6.0.1  # <-- AJOUTER ICI
-          echo "✅ Core dependencies installed (including pyyaml)"
+          echo "? Core dependencies installed (including pyyaml)"
 
       - name: Test API imports
         run: |
-          echo "🧪 Testing API imports..."
+          echo "?? Testing API imports..."
           python -c "
           try:
               # Test API main
               from src.api.main import app
-              print('✅ src.api.main import successful')
+              print('? src.api.main import successful')
               
               # Test other modules if they exist
               try:
                   from src.api.dependencies import get_health_info
-                  print('✅ dependencies import successful')
+                  print('? dependencies import successful')
               except ImportError:
-                  print('⚠️ dependencies module not found (optional)')
+                  print('?? dependencies module not found (optional)')
                   
               try:
                   from src.api.routers import predict, health, admin
-                  print('✅ routers import successful')
+                  print('? routers import successful')
               except ImportError:
-                  print('⚠️ routers module not found (optional)')
+                  print('?? routers module not found (optional)')
                   
               try:
                   from src.api.schemas import PredictionResponse, HealthResponse
-                  print('✅ schemas import successful')
+                  print('? schemas import successful')
               except ImportError:
-                  print('⚠️ schemas module not found (optional)')
+                  print('?? schemas module not found (optional)')
               
-              print('✅ API imports completed!')
+              print('? API imports completed!')
               
           except Exception as e:
-              print(f'❌ Critical API import error: {e}')
+              print(f'? Critical API import error: {e}')
               import traceback
               traceback.print_exc()
               exit(1)
@@ -119,24 +119,24 @@ jobs:
 
       - name: Test data modules
         run: |
-          echo "📊 Testing data modules..."
+          echo "?? Testing data modules..."
           python -c "
           try:
               # Test preprocess
               from src.data.preprocess import clean_text
-              print('✅ preprocess module import successful')
+              print('? preprocess module import successful')
               
               # Test collect_data if exists
               try:
                   from src.data import collect_data
-                  print('✅ collect_data module exists')
+                  print('? collect_data module exists')
               except ImportError:
-                  print('⚠️ collect_data module not found (optional)')
+                  print('?? collect_data module not found (optional)')
               
-              print('✅ Data modules check completed!')
+              print('? Data modules check completed!')
               
           except Exception as e:
-              print(f'❌ Data import error: {e}')
+              print(f'? Data import error: {e}')
               import traceback
               traceback.print_exc()
               exit(1)
@@ -144,12 +144,12 @@ jobs:
 
       - name: Test model modules
         run: |
-          echo "🤖 Testing model modules..."
+          echo "?? Testing model modules..."
           python -c "
           try:
               # Check if train.py exists and can be imported
               import src.models.train
-              print('✅ train.py module exists')
+              print('? train.py module exists')
               
               # List functions in train.py
               import inspect
@@ -157,40 +157,40 @@ jobs:
                   train_functions = [name for name, _ in inspect.getmembers(src.models.train, inspect.isfunction)]
                   print(f'Functions in train.py: {train_functions}')
               except:
-                  print('⚠️ Could not list functions in train.py')
+                  print('?? Could not list functions in train.py')
               
               # Check other model modules if they exist
               try:
                   import src.models.evaluate
-                  print('✅ evaluate.py module exists')
+                  print('? evaluate.py module exists')
               except ImportError:
-                  print('⚠️ evaluate.py not found (optional)')
+                  print('?? evaluate.py not found (optional)')
                   
               try:
                   import src.models.evaluate_all
-                  print('✅ evaluate_all.py module exists')
+                  print('? evaluate_all.py module exists')
               except ImportError:
-                  print('⚠️ evaluate_all.py not found (optional)')
+                  print('?? evaluate_all.py not found (optional)')
               
-              print('✅ Model modules check completed!')
+              print('? Model modules check completed!')
               
           except Exception as e:
-              print(f'❌ Model import error: {e}')
+              print(f'? Model import error: {e}')
               # Don't fail if it's just missing optional modules
               if 'No module named' in str(e):
-                  print(f'⚠️ Module not found: {e}')
+                  print(f'?? Module not found: {e}')
               else:
                   exit(1)
           "
 
       - name: Test Airflow DAG syntax
         run: |
-          echo "🧪 Testing Airflow DAG syntax..."
+          echo "?? Testing Airflow DAG syntax..."
           if [ -d "dags" ]; then
             for dag_file in dags/*.py; do
               if [ -f "$dag_file" ]; then
                 echo "Testing $dag_file..."
-                python -m py_compile "$dag_file" && echo "  ✅ Syntax OK" || echo "  ❌ Syntax error"
+                python -m py_compile "$dag_file" && echo "  ? Syntax OK" || echo "  ? Syntax error"
               fi
             done
           else
@@ -199,31 +199,31 @@ jobs:
 
       - name: Test utility modules
         run: |
-          echo "🔧 Testing utility modules..."
+          echo "?? Testing utility modules..."
           python -c "
           try:
               # Test config_loader if exists
               try:
                   import src.utils.config_loader
-                  print('✅ config_loader module exists')
+                  print('? config_loader module exists')
               except ImportError:
-                  print('⚠️ config_loader module not found (optional)')
+                  print('?? config_loader module not found (optional)')
               
-              print('✅ Utility modules check completed!')
+              print('? Utility modules check completed!')
               
           except Exception as e:
-              print(f'⚠️ Utility import note: {e}')
+              print(f'?? Utility import note: {e}')
               print('Continuing anyway...')
           "
 
       - name: Create minimal requirements test
         run: |
-          echo "📋 Creating minimal requirements.txt test..."
+          echo "?? Creating minimal requirements.txt test..."
           python -c "
           import sys
           print(f'Python {sys.version}')
 
-          # Vérifier les imports essentiels
+          # V�rifier les imports essentiels
           required_packages = [
               ('fastapi', 'fastapi'),
               ('sklearn', 'sklearn'),
@@ -236,13 +236,13 @@ jobs:
           for import_name, package_name in required_packages:
               try:
                   __import__(import_name)
-                  print(f'✅ {package_name}')
+                  print(f'? {package_name}')
               except ImportError as e:
-                  print(f'❌ {package_name}: {e}')
+                  print(f'? {package_name}: {e}')
                   missing_packages.append(package_name)
 
           if missing_packages:
-              print(f'⚠️ Missing packages: {missing_packages}')
+              print(f'?? Missing packages: {missing_packages}')
               print('Note: This is just a warning, not a failure')
           "
 
@@ -257,30 +257,30 @@ jobs:
 
       - name: Check model files
         run: |
-          echo "🤖 Verifying model files..."
+          echo "?? Verifying model files..."
 
           if [ -d "models" ]; then
-            echo "📁 Models directory exists"
+            echo "?? Models directory exists"
             ls -la models/
             
-            # Compter les modèles
+            # Compter les mod�les
             pkl_files=$(ls models/*.pkl 2>/dev/null | wc -l)
             echo ""
-            echo "📊 Model statistics:"
+            echo "?? Model statistics:"
             echo "  - Total .pkl files: $pkl_files"
             
             if [ $pkl_files -gt 0 ]; then
-              echo "✅ Models found:"
+              echo "? Models found:"
               for file in models/*.pkl; do
                 size_kb=$(du -k "$file" | cut -f1)
                 echo "  - $(basename $file) (${size_kb}KB)"
               done
             else
-              echo "⚠️ No .pkl files found in models directory"
+              echo "?? No .pkl files found in models directory"
               echo "Note: This is acceptable for initial setup"
             fi
           else
-            echo "⚠️ Models directory not found"
+            echo "?? Models directory not found"
             echo "Note: This is acceptable for initial setup"
           fi
 
@@ -298,36 +298,36 @@ jobs:
 
       - name: Build Docker image
         run: |
-          echo "🐳 Building Docker image..."
+          echo "?? Building Docker image..."
 
-          # Vérifier que le Dockerfile existe
+          # V�rifier que le Dockerfile existe
           if [ ! -f "Dockerfile" ]; then
-            echo "❌ Dockerfile not found!"
+            echo "? Dockerfile not found!"
             exit 1
           fi
 
           # Construire l'image
           docker build -t spam-detection-mlops:ci-test .
-          echo "✅ Docker image built successfully"
+          echo "? Docker image built successfully"
 
-          # Vérifier l'image
+          # V�rifier l'image
           echo ""
-          echo "📦 Docker image details:"
+          echo "?? Docker image details:"
           docker images spam-detection-mlops:ci-test
 
       - name: Test Docker image (quick test)
         run: |
-          echo "🧪 Quick Docker test..."
+          echo "?? Quick Docker test..."
 
-          # Test simple: vérifier que l'image peut être exécutée
+          # Test simple: v�rifier que l'image peut �tre ex�cut�e
           echo "Testing basic container execution..."
           docker run --rm spam-detection-mlops:ci-test python -c "
-          print('✅ Python works inside container')
+          print('? Python works inside container')
           import sys
           print(f'Python path: {sys.path}')
           "
 
-          echo "✅ Docker image test passed"
+          echo "? Docker image test passed"
 
   success-notification:
     runs-on: ubuntu-latest
@@ -364,59 +364,59 @@ jobs:
           docker push ghcr.io/${{ github.repository }}/spam-ml-api:latest
           docker push ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }}
           
-          echo "✅ Docker image pushed to GitHub Packages"
-          echo "📦 Latest: ghcr.io/${{ github.repository }}/spam-ml-api:latest"
-          echo "🔖 Version: ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }}"
+          echo "? Docker image pushed to GitHub Packages"
+          echo "?? Latest: ghcr.io/${{ github.repository }}/spam-ml-api:latest"
+          echo "?? Version: ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }}"
 
       - name: Update deployment status
         run: |
-          echo "🚀 DEPLOYMENT COMPLETE"
+          echo "?? DEPLOYMENT COMPLETE"
           echo "======================"
           echo "Repository: ${{ github.repository }}"
           echo "Commit: ${{ github.sha }}"
           echo "Image: ghcr.io/${{ github.repository }}/spam-ml-api"
           echo "Tags: latest, ${{ github.sha }}"
           echo ""
-          echo "📊 Pull command:"
+          echo "?? Pull command:"
           echo "docker pull ghcr.io/${{ github.repository }}/spam-ml-api:latest"
     steps:
       - name: Pipeline completed
         run: |
-          echo "🎉🎉🎉 MLOps CI/CD Pipeline SUCCESSFUL! 🎉🎉🎉"
+          echo "?????? MLOps CI/CD Pipeline SUCCESSFUL! ??????"
           echo ""
-          echo "📊 PIPELINE SUMMARY:"
+          echo "?? PIPELINE SUMMARY:"
           echo ""
-          echo "✅ Structure Validation:"
+          echo "? Structure Validation:"
           echo "  - Project structure verified"
           echo "  - Required files present"
           echo "  - Airflow DAGs detected"
           echo ""
-          echo "✅ Module Testing:"
+          echo "? Module Testing:"
           echo "  - API imports working"
           echo "  - Data modules working"
           echo "  - Model modules working"
           echo "  - Airflow DAG syntax validated"
           echo "  - Utility modules verified"
           echo ""
-          echo "✅ Model Verification:"
+          echo "? Model Verification:"
           echo "  - Models directory exists"
           echo "  - .pkl files checked"
           echo ""
-          echo "✅ Docker Build:"
+          echo "? Docker Build:"
           echo "  - Dockerfile validated"
           echo "  - Image built successfully"
           echo "  - Container test passed"
           echo ""
-          echo "🚀 PROJECT READY:"
-          echo "  - FastAPI ML Pipeline: ✅"
-          echo "  - Airflow Orchestration: ✅"
-          echo "  - Docker Container: ✅"
-          echo "  - CI/CD Pipeline: ✅"
+          echo "?? PROJECT READY:"
+          echo "  - FastAPI ML Pipeline: ?"
+          echo "  - Airflow Orchestration: ?"
+          echo "  - Docker Container: ?"
+          echo "  - CI/CD Pipeline: ?"
           echo ""
-          echo "📈 Badge for README.md:"
+          echo "?? Badge for README.md:"
           echo "![CI/CD Status](https://github.com/${{ github.repository }}/actions/workflows/${{ github.workflow }}/badge.svg)"
           echo ""
-          echo "🔗 GitHub Actions URL:"
+          echo "?? GitHub Actions URL:"
           echo "https://github.com/${{ github.repository }}/actions"
 
 
