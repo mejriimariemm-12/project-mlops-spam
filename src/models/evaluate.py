@@ -1,4 +1,4 @@
-# src/models/evaluate.py - Version améliorée
+﻿# src/models/evaluate.py - Version amÃ©liorÃ©e
 import pandas as pd
 import joblib
 import json
@@ -11,7 +11,12 @@ from sklearn.metrics import (
     classification_report, confusion_matrix, roc_auc_score, roc_curve
 )
 import matplotlib.pyplot as plt
-import seaborn as sns
+try:
+    import seaborn as sns
+    SEABORN_AVAILABLE = True
+except ImportError:
+    SEABORN_AVAILABLE = False
+    print("Warning: seaborn not installed, using basic matplotlib plots")
 from datetime import datetime
 
 def load_config(config_path="config/config.yaml"):
@@ -19,28 +24,28 @@ def load_config(config_path="config/config.yaml"):
         return yaml.safe_load(f)
 
 def evaluate_model(model_path, data_path, output_path, config):
-    """Évalue un modèle sur un jeu de données"""
-    print(f"Chargement du modèle depuis {model_path}")
+    """Ã‰value un modÃ¨le sur un jeu de donnÃ©es"""
+    print(f"Chargement du modÃ¨le depuis {model_path}")
     model_dict = joblib.load(model_path)
     model = model_dict['model']
     vectorizer = model_dict['vectorizer']
     
-    print(f"Chargement des données depuis {data_path}")
+    print(f"Chargement des donnÃ©es depuis {data_path}")
     data = pd.read_csv(data_path)
     X = data['text'].astype(str)
     y = data['label']
     
-    print(f"Données: {len(X)} échantillons")
+    print(f"DonnÃ©es: {len(X)} Ã©chantillons")
     print(f"Distribution des labels:\n{y.value_counts()}")
     
     # Vectorisation
     X_vect = vectorizer.transform(X)
     
-    # Prédictions
+    # PrÃ©dictions
     y_pred = model.predict(X_vect)
     y_pred_proba = model.predict_proba(X_vect)[:, 1] if hasattr(model, "predict_proba") else None
     
-    # Calcul des métriques
+    # Calcul des mÃ©triques
     metrics = {
         "accuracy": accuracy_score(y, y_pred),
         "precision": precision_score(y, y_pred),
@@ -52,13 +57,13 @@ def evaluate_model(model_path, data_path, output_path, config):
     if y_pred_proba is not None:
         metrics["roc_auc"] = roc_auc_score(y, y_pred_proba)
     
-    # Rapport de classification détaillé
+    # Rapport de classification dÃ©taillÃ©
     report = classification_report(y, y_pred, output_dict=True)
     
     # Matrice de confusion
     cm = confusion_matrix(y, y_pred)
     
-    # Sauvegarder les résultats
+    # Sauvegarder les rÃ©sultats
     results = {
         "model_path": model_path,
         "data_path": data_path,
@@ -73,21 +78,21 @@ def evaluate_model(model_path, data_path, output_path, config):
         }
     }
     
-    # Créer le dossier de sortie
+    # CrÃ©er le dossier de sortie
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     
     # Sauvegarder en JSON
     with open(output_path, 'w') as f:
         json.dump(results, f, indent=2)
     
-    # Créer des visualisations
+    # CrÃ©er des visualisations
     if config.get('evaluation', {}).get('save_plots', True):
         create_evaluation_plots(y, y_pred, y_pred_proba, output_path)
     
     return results
 
 def create_evaluation_plots(y_true, y_pred, y_pred_proba, output_path):
-    """Crée des visualisations pour l'évaluation"""
+    """CrÃ©e des visualisations pour l'Ã©valuation"""
     plots_dir = os.path.join(os.path.dirname(output_path), "plots")
     os.makedirs(plots_dir, exist_ok=True)
     
@@ -123,7 +128,7 @@ def create_evaluation_plots(y_true, y_pred, y_pred_proba, output_path):
         plt.savefig(os.path.join(plots_dir, 'roc_curve.png'))
         plt.close()
     
-    # 3. Distribution des prédictions
+    # 3. Distribution des prÃ©dictions
     plt.figure(figsize=(10, 4))
     
     plt.subplot(1, 2, 1)
@@ -135,8 +140,8 @@ def create_evaluation_plots(y_true, y_pred, y_pred_proba, output_path):
     
     plt.subplot(1, 2, 2)
     pd.Series(y_pred).value_counts().plot(kind='bar', color=['lightblue', 'pink'])
-    plt.title('Distribution des Prédictions')
-    plt.xlabel('Label Prédit')
+    plt.title('Distribution des PrÃ©dictions')
+    plt.xlabel('Label PrÃ©dit')
     plt.ylabel('Count')
     plt.xticks(rotation=0)
     
@@ -162,7 +167,7 @@ def main():
     mlflow.set_experiment(config['mlflow']['experiment_name'])
     
     with mlflow.start_run(run_name=f"eval_{datetime.now().strftime('%Y%m%d_%H%M%S')}"):
-        # Évaluer le modèle
+        # Ã‰valuer le modÃ¨le
         results = evaluate_model(args.model, args.data, args.out, config)
         
         # Log dans MLflow
@@ -183,18 +188,18 @@ def main():
         if os.path.exists(plots_dir):
             mlflow.log_artifacts(plots_dir, "evaluation_plots")
         
-        # Affichage des résultats
+        # Affichage des rÃ©sultats
         print("\n" + "="*50)
-        print("RÉSULTATS DE L'ÉVALUATION")
+        print("RÃ‰SULTATS DE L'Ã‰VALUATION")
         print("="*50)
         for metric_name, metric_value in results['metrics'].items():
             print(f"{metric_name:<15}: {metric_value:.4f}")
         
-        print(f"\nRapport sauvegardé dans: {args.out}")
+        print(f"\nRapport sauvegardÃ© dans: {args.out}")
         print(f"Run MLflow ID: {mlflow.active_run().info.run_id}")
         print("="*50)
     
-    print("✅ Évaluation terminée avec succès!")
+    print("âœ… Ã‰valuation terminÃ©e avec succÃ¨s!")
 
 if __name__ == "__main__":
     main()
