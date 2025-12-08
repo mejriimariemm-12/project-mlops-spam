@@ -334,6 +334,51 @@ jobs:
     needs: build-docker
     if: success()
 
+
+  deploy-to-github-packages:
+    runs-on: ubuntu-latest
+    needs: build-docker
+    if: github.event_name == "push" && github.ref == "refs/heads/main"
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        run: |
+          # Construire l'image
+          docker build -t ghcr.io/${{ github.repository }}/spam-ml-api:latest .
+          docker build -t ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }} .
+          
+          # Pousser les images
+          docker push ghcr.io/${{ github.repository }}/spam-ml-api:latest
+          docker push ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }}
+          
+          echo "✅ Docker image pushed to GitHub Packages"
+          echo "📦 Latest: ghcr.io/${{ github.repository }}/spam-ml-api:latest"
+          echo "🔖 Version: ghcr.io/${{ github.repository }}/spam-ml-api:${{ github.sha }}"
+
+      - name: Update deployment status
+        run: |
+          echo "🚀 DEPLOYMENT COMPLETE"
+          echo "======================"
+          echo "Repository: ${{ github.repository }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Image: ghcr.io/${{ github.repository }}/spam-ml-api"
+          echo "Tags: latest, ${{ github.sha }}"
+          echo ""
+          echo "📊 Pull command:"
+          echo "docker pull ghcr.io/${{ github.repository }}/spam-ml-api:latest"
     steps:
       - name: Pipeline completed
         run: |
@@ -373,4 +418,5 @@ jobs:
           echo ""
           echo "🔗 GitHub Actions URL:"
           echo "https://github.com/${{ github.repository }}/actions"
+
 
