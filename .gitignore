@@ -1,13 +1,57 @@
-# Environnements virtuels
-venv/
-
-# DVC local storage
-dvc_storage/
-
-# MLflow runs
-mlruns/
-
-# Fichiers temporaires Python
+﻿# Python
 __pycache__/
-*.pyc
-.history/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Logs
+logs/
+airflow/logs/
+*.log
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+mlops_env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Data
+data/processed/
+models/  # Si vous voulez exclure les modèles entraînés
+mlflow.db
+
+# DVC
+.dvc/
+
+# Airflow
+airflow/  # Exclure le répertoire airflow local
